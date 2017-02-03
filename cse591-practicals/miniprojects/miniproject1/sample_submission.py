@@ -20,7 +20,7 @@ class regressor(object):
     alpha = 0.1
     error_buffer = []
     error_valid = []
-    l = 0.0001
+    l = 0.001
 
     def __init__(self, data):
         self.x, self.y = data
@@ -37,24 +37,36 @@ class regressor(object):
         n = len(self.x) * 0.9
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(
             self.x, self.y, test_size=0.2, random_state=40)
+        self.X_train = self.x
+        self.y_train = self.y
         self.train()
         plt.plot(self.error_buffer)
         plt.plot(self.error_valid)
         plt.show()
 
     def train(self):
-        for i in range(1, 1000):
-            delta = np.mean(((self.y_train - self.X_train.dot(self.w))
-                             * self.X_train) + (self.l * np.hstack(self.w)), axis=0)
-            # print(np.mean(delta).shape)
+        i = 0
+        while(True):
+            # + (self.l * np.hstack(self.w))
+            delta = sum([(y - x.dot(self.w)) * x for x,
+                         y in zip(self.X_train, self.y_train)])
+            # delta = ((self.y_train -
+            # self.X_train.dot(self.w)).T.dot(self.X_train)) /
+            # len(self.X_train)
+            reg = 2 * self.l * self.w
+            delta /= len(self.X_train)
+            delta = np.reshape(delta, (len(delta), 1)) + reg
+            print(delta.shape)
             self.w += self.alpha * np.vstack(delta)
             self.error_buffer.append(
                 get_error(self.X_train, self.y_train, self.w, self.l))
             self.error_valid.append(
                 get_error(self.X_val, self.y_val, self.w, self.l))
             print("Error at epoch " + str(i) + " :: " +
-                  str(self.error_buffer[-1]) + "Error Difference ::")
-            print(self.error_buffer[-2] - self.error_buffer[-1])
+                  str(self.error_buffer[-1]) + "Error Difference ::" + str((self.error_buffer[-2] - self.error_buffer[-1])))
+            i += 1
+            if(self.error_buffer[-2] - self.error_buffer[-1] < 0.00001):
+                break
 
     def get_params(self):
         """
@@ -85,7 +97,7 @@ class regressor(object):
         # Here is where you write a code to evaluate the data and produce
         # predictions.
         x = np.concatenate((x, np.vstack(np.ones(len(x)))), axis=1)
-        return(self.w.T * x)
+        return(x.dot(self.w))
 
 
 def l2_norm(W):
@@ -96,7 +108,7 @@ def get_error(X, y, w, l):
     regularizer = l2_norm(w)
     # print(w.shape)
     error = y - X.dot(w)
-    return np.mean(error * error + l * 0.5 * regularizer)
+    return np.mean(error * error + l * 2 * regularizer)
     # return sum([(y - x.T.dot(w)) ** 2 for x, y in zip(X_train, y_train)])
 
 if __name__ == '__main__':
