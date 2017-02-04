@@ -1,6 +1,6 @@
 # will ``sample_submission`` to your submission filename.
 
-from sample_submission import regressor
+from amotupal_motupalli.regressor import regressor
 import numpy as np
 
 
@@ -50,7 +50,6 @@ class dataset_generator(object):
             self.sigma = kwargs['sigma']
         else:
             self.sigma = 0.1
-
         self.w = np.random.rand(self.dimensions, 1)
         self.b = np.random.rand(1)
 
@@ -70,7 +69,6 @@ class dataset_generator(object):
             samples = kwargs['samples']
         else:
             samples = np.random.randint(low=1000, high=5000)
-
         x = np.random.uniform(size=(samples, self.dimensions))
         y = np.dot(x, self.w) + np.random.normal(self.mu,
                                                  self.sigma, (samples, 1)) + self.b
@@ -79,7 +77,7 @@ class dataset_generator(object):
 
 if __name__ == '__main__':
 
-    dg = dataset_generator(dimensions=20)  # Initialize a dataset creator
+    dg = dataset_generator()  # Initialize a dataset creator
     # Create a random training dataset.
     data_train = dg.query_data(samples=5000)
 
