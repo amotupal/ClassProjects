@@ -20,6 +20,10 @@ def accuracy(labels,  predictions):
         The grade that you will get will depend on this output. The lower this value, the higher 
         your grade.
     """
+    # print("labels::")
+    # print(labels)
+    # print("predictions")
+    # print(predictions)
     return (np.sum(np.asarray(predictions == labels, dtype='int'), axis=0) / float(labels.shape[0])) * 100
 
 
